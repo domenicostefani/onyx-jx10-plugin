@@ -1,0 +1,44 @@
+{
+  "version": 4,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 22,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "msvc-release",
+      "displayName": "Win MSVC17 Release",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "binaryDir": "${sourceDir}/build/VisualStudio2022/x64",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "VST3_COPY_DIR": "$ENV{USERPROFILE}/Documents/VST_DEBUG"
+      }
+    },
+    {
+      "name": "msvc-debug",
+      "displayName": "Win MSVC17 Debug",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "binaryDir": "${sourceDir}/build/VisualStudio2022/x64",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "VST3_COPY_DIR": "$ENV{USERPROFILE}/Documents/VST_DEBUG"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "msvc-release",
+      "configurePreset": "msvc-release",
+      "configuration": "Release"
+    },
+    {
+      "name": "msvc-debug",
+      "configurePreset": "msvc-debug",
+      "configuration": "Debug"
+    }
+  ]
+}

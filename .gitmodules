@@ -1,0 +1,3 @@
+[submodule "modules/fatar_sl_link"]
+	path = modules/fatar_sl_link
+	url = https://github.com/gregogiudici/fatar_sl_link
