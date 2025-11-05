@@ -115,7 +115,11 @@ void JX10AudioProcessor::setCurrentProgram(int index)
 
 const juce::String JX10AudioProcessor::getProgramName(int index)
 {
-    return { _programs[index].name };
+    // return { _programs[index].name };
+    if (index >= 0 && index < getNumPrograms())
+        return juce::String(_programs[index].name);
+    else
+        return {}; //TODO: check why vector subscript bug
 }
 
 void JX10AudioProcessor::changeProgramName(int index, const juce::String &newName)
@@ -1242,14 +1246,53 @@ juce::AudioProcessorEditor *JX10AudioProcessor::createEditor()
 
 void JX10AudioProcessor::getStateInformation(juce::MemoryBlock &destData)
 {
-    copyXmlToBinary(*apvts.copyState().createXml(), destData);
+    // copyXmlToBinary(*apvts.copyState().createXml(), destData);
+    DBG("getStateInformation: Saving APVTS state information.");
+
+    juce::XmlElement root("PLUGINSTATE");
+
+    // Properly release unique_ptr ownership to root:
+    std::unique_ptr<juce::XmlElement> apvtsXml = apvts.copyState().createXml();
+    if (apvtsXml)
+        root.addChildElement(apvtsXml.release());
+
+    DBG("getStateInformation: Saving UIManager state.");
+
+    // Get UI state and convert to JSON string
+    juce::var uiState = uiManager.getUIState();
+    juce::String uiStateJson = juce::JSON::toString(uiState);
+    
+    // Create XML element and add JSON as text
+    auto uiStateXml = std::make_unique<juce::XmlElement>("UIManagerState");
+    uiStateXml->addTextElement(uiStateJson);
+    root.addChildElement(uiStateXml.release());
+
+    DBG("getStateInformation: Finished saving state information.");
+
+    copyXmlToBinary(root, destData);
 }
 
 void JX10AudioProcessor::setStateInformation(const void *data, int sizeInBytes)
 {
-    std::unique_ptr<juce::XmlElement> xml(getXmlFromBinary(data, sizeInBytes));
-    if (xml.get() != nullptr && xml->hasTagName(apvts.state.getType())) {
-        apvts.replaceState(juce::ValueTree::fromXml(*xml));
+    DBG("setStateInformation: Restoring state information.");
+    // std::unique_ptr<juce::XmlElement> xml(getXmlFromBinary(data, sizeInBytes));
+    // if (xml.get() != nullptr && xml->hasTagName(apvts.state.getType())) {
+    //     apvts.replaceState(juce::ValueTree::fromXml(*xml));
+    // }
+    std::unique_ptr<juce::XmlElement> root(getXmlFromBinary(data, sizeInBytes));
+    if (root == nullptr)
+        return;
+
+    // Restore APVTS state if present
+    if (auto *apvtsXml = root->getChildByName(apvts.state.getType()))
+        apvts.replaceState(juce::ValueTree::fromXml(*apvtsXml));
+
+    // Restore UIManager state if present
+    if (auto *uiStateXml = root->getChildByName("UIManagerState"))
+    {
+        juce::String uiStateStr = uiStateXml->getAllSubText();
+        juce::var uiState = juce::JSON::parse(uiStateStr);
+        uiManager.setUIState(uiState);
     }
 }
 
@@ -1599,6 +1642,15 @@ juce::AudioProcessorValueTreeState::ParameterLayout JX10AudioProcessor::createPa
                     return juce::String(200.0f * value - 100.0f, 1);
                 }
             )));
+
+    layout.add(std::make_unique<juce::AudioParameterChoice>(
+        juce::ParameterID("currentPage", 1),      // parameter ID
+        "SLLink",           // parameter name
+        getPageChoices(BinaryData::slui_json,
+                        BinaryData::slui_jsonSize), // choices
+        0,                  // default index 
+        "SLLink"            // parameter group (optional)
+        ));
 
     return layout;
 }

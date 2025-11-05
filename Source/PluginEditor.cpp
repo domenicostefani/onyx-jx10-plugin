@@ -229,7 +229,7 @@ JX10Editor::JX10Editor (JX10AudioProcessor& p)
     osc2tune_knob.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
     osc2tune_knob.setRotaryParameters(rotaryParams);
     osc2tune_knob.setLookAndFeel(&JX10LookAndFeel);
-    osc2tuneAttachment.reset(new SliderAttachment(audioProcessor.apvts, "Osc Tune", osc2tune_knob));
+    osc2tuneAttachment.reset(new SliderAttachment(audioProcessor.apvts, "OSC Tune", osc2tune_knob));
 
     addAndMakeVisible(&osc2fine_knob);
     osc2fine_knob.setRange(-1.0, 1.0, 0.01); // Example range for fine tuning
@@ -238,7 +238,7 @@ JX10Editor::JX10Editor (JX10AudioProcessor& p)
     osc2fine_knob.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
     osc2fine_knob.setRotaryParameters(rotaryParams);
     osc2fine_knob.setLookAndFeel(&JX10LookAndFeel);
-    osc2fineAttachment.reset(new SliderAttachment(audioProcessor.apvts, "Osc2 Fine", osc2fine_knob));
+    osc2fineAttachment.reset(new SliderAttachment(audioProcessor.apvts, "OSC Fine", osc2fine_knob));
 
     addAndMakeVisible(&tuning_knob);
     tuning_knob.setRange(-50, 50, 1); // Example range for global tuning (cents)

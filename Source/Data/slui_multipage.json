@@ -1,0 +1,323 @@
+{
+    "version": "1.0",
+    "colours": [
+        "#e0140d",
+        "#A40E0A"
+    ],
+    "pages": [
+        {
+            "id": "HOME",
+            "shortname": "Home",
+            "title": "Onyx JX10",
+            "subtitle": "HOME",
+            "type": "grid",
+            "colour": "#000000",
+            "cells": [
+                {
+                    "title": "OSC",
+                    "colour": 0,
+                    "row1": {
+                        "text": "Oscillator",
+                        "bitmapGroupIdx": -1,
+                        "bitmapIdx": -1
+                    },
+                    "row2": {
+                        "text": "Section",
+                        "bitmapGroupIdx": -1,
+                        "bitmapIdx": -1
+                    },
+                    "bottomRightChar": "1"
+                },
+                {
+                    "title": "VCF",
+                    "colour": 0,
+                    "row1": {
+                        "text": "Filter",
+                        "bitmapGroupIdx": -1,
+                        "bitmapIdx": -1
+                    },
+                    "row2": {
+                        "text": "Section",
+                        "bitmapGroupIdx": -1,
+                        "bitmapIdx": -1
+                    },
+                    "bottomRightChar": "2"
+                },
+                {
+                    "title": "LFO",
+                    "colour": 0,
+                    "row1": {
+                        "text": "Modulation",
+                        "bitmapGroupIdx": -1,
+                        "bitmapIdx": -1
+                    },
+                    "row2": {
+                        "text": "",
+                        "bitmapGroupIdx": -1,
+                        "bitmapIdx": -1
+                    },
+                    "bottomRightChar": "3"
+                },
+                {
+                    "title": "Master",
+                    "colour": 0,
+                    "row1": {
+                        "text": "Tuning",
+                        "bitmapGroupIdx": -1,
+                        "bitmapIdx": -1
+                    },
+                    "row2": {
+                        "text": "",
+                        "bitmapGroupIdx": -1,
+                        "bitmapIdx": -1
+                    },
+                    "bottomRightChar": "4"
+                }
+            ],
+            "overwriteGlobalNavigation": false,
+            "navigation": {
+                "JOYSTICK_LEFT": "HOME",
+                "JOYSTICK_RIGHT": "OSC",
+                "HOME": "NAV"
+            },
+            "next": "OSC",
+            "prev": ""
+        },
+        {
+            "id": "OSC",
+            "shortname": "OSC",
+            "title": "OSC",
+            "colour": 0,
+            "type": "row",
+            "parameters": [
+                {
+                    "name": "OSC-2 Mix",
+                    "id": "OSC Mix",
+                    "type": "knob",
+                    "description": "Level of second oscillator (both oscillators are sawtooth wave only - but see Vibrato below)"
+                },
+                {
+                    "name": "OSC-2 Tune",
+                    "id": "OSC Tune",
+                    "type": "knob",
+                    "description": "Tuning of second oscillator in semitones"
+                },
+                {
+                    "name": "OSC-2 FineTune",
+                    "id": "OSC Fine",
+                    "type": "knob",
+                    "description": "Tuning of second oscillator in cents"
+                },
+                {
+                    "name": "Noise",
+                    "id": "Noise",
+                    "type": "knob",
+                    "description": "White noise mix"
+                }
+            ],
+            "group": "OSC",
+            "next": "VCF",
+            "prev": "HOME"
+        },
+        {
+            "id": "VCF",
+            "shortname": "VCF",
+            "title": "VCF",
+            "colour": 0,
+            "type": "row",
+            "parameters": [
+                {
+                    "name": "Frequency",
+                    "id": "VCF Freq",
+                    "type": "knob",
+                    "description": "Filter cutoff frequency"
+                },
+                {
+                    "name": "Resonance",
+                    "id": "VCF Reso",
+                    "type": "knob",
+                    "description": "Filter resonance"
+                },
+                {
+                    "name": "Envelope",
+                    "id": "VCF Env",
+                    "type": "knob",
+                    "description": "Cutoff modulation by VCF envelope"
+                },
+                {
+                    "name": "Velocity",
+                    "id": "VCF Vel",
+                    "type": "knob",
+                    "description": "Cutoff modulation by velocity (turn fully left to disable velocity control of cutoff and amplitude)"
+                }
+            ],
+            "group": "VCF",
+            "next": "VCFENV",
+            "prev": "OSC"
+        },
+        {
+            "id": "VCFENV",
+            "shortname": "VCF Env",
+            "title": "VCF Envelope",
+            "colour": 0,
+            "type": "row",
+            "parameters": [
+                {
+                    "name": "Attack",
+                    "id": "VCF Att",
+                    "type": "knob",
+                    "description": ""
+                },
+                {
+                    "name": "Decay",
+                    "id": "VCF Dec",
+                    "type": "knob",
+                    "description": ""
+                },
+                {
+                    "name": "Sustain",
+                    "id": "VCF Sus",
+                    "type": "knob",
+                    "description": ""
+                },
+                {
+                    "name": "Release",
+                    "id": "VCF Rel",
+                    "type": "knob",
+                    "description": ""
+                }
+            ],
+            "group": "VCF",
+            "next": "LFO",
+            "prev": "VCF"
+        },
+        {
+            "id": "LFO",
+            "shortname": "LFO",
+            "title": "LFO",
+            "colour": 0,
+            "type": "row",
+            "parameters": [
+                {
+                    "name": "VCF LFO Amt",
+                    "id": "VCF LFO",
+                    "type": "knob",
+                    "description": ""
+                },
+                {
+                    "name": "LFO Rate",
+                    "id": "LFO Rate",
+                    "type": "knob",
+                    "description": "LFO rate (sine wave only)"
+                },
+                {
+                    "name": "Vibrato Amt",
+                    "id": "Vibrato",
+                    "type": "knob",
+                    "description": "LFO modulation of pitch - turn to left for PWM effects"
+                }
+            ],
+            "group": "MOD",
+            "next": "AMPENV",
+            "prev": "VCFENV"
+        },
+        {
+            "id": "AMPENV",
+            "shortname": "Amp Env",
+            "title": "Amp Envelope",
+            "colour": 0,
+            "type": "row",
+            "parameters": [
+                {
+                    "name": "Attack",
+                    "id": "ENV Att",
+                    "type": "knob",
+                    "description": ""
+                },
+                {
+                    "name": "Decay",
+                    "id": "ENV Dec",
+                    "type": "knob",
+                    "description": ""
+                },
+                {
+                    "name": "Sustain",
+                    "id": "ENV Sus",
+                    "type": "knob",
+                    "description": ""
+                },
+                {
+                    "name": "Release",
+                    "id": "ENV Rel",
+                    "type": "knob",
+                    "description": ""
+                }
+            ],
+            "group": "MOD",
+            "next": "TUNING",
+            "prev": "LFO"
+        },
+        {
+            "id": "TUNING",
+            "shortname": "Tuning",
+            "title": "Tuning",
+            "colour": 0,
+            "type": "row",
+            "parameters": [
+                {
+                    "name": "Octave",
+                    "id": "Octave",
+                    "type": "knob",
+                    "description": "Master tuning in octaves"
+                },
+                {
+                    "name": "+/- Tuning",
+                    "id": "Tuning",
+                    "type": "knob",
+                    "description": "Master tuning in cents"
+                }
+            ],
+            "group": "MASTER",
+            "next": "",
+            "prev": "AMPENV"
+        },
+        {
+            "id": "PROGRAMS",
+            "shortname": "Programs",
+            "title": "Programs",
+            "subtitle": "BROWSE",
+            "type": "programs",
+            "colour": "#dcdcdc",
+            "navigation": {
+                "JOYSTICK_LEFT": "",
+                "JOYSTICK_RIGHT": "",
+                "HOME": "HOME",
+                "DAW": "HOME"
+            }
+        },
+        {
+            "id": "NAV",
+            "shortname": "Navigation",
+            "title": "Navigation",
+            "subtitle": "Parameter pages",
+            "type": "navigation",
+            "colour": "#dcdcdc",
+            "overwriteGlobalNavigation": true,
+            "navigation": {
+                "JOYSTICK_LEFT": "",
+                "JOYSTICK_RIGHT": "",
+                "HOME": "HOME"
+            }
+        }
+    ],
+    "navigation": {
+        "HOME": "HOME",
+        "DAW": "PROGRAMS",
+        "SELECT_ZOOM_1": "OSC",
+        "SELECT_ZOOM_2": "VCF",
+        "SELECT_ZOOM_3": "LFO",
+        "SELECT_ZOOM_4": "TUNING",
+        "JOYSTICK_LEFT": "${prev}",
+        "JOYSTICK_RIGHT": "${next}"
+    }
+}
