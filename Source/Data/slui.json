@@ -14,11 +14,11 @@
             "colour": 0,
             "defaultParametersExplained": "The first 4 parameters are assigned to the 4 encoders, the next 4 to the zone buttons, then 1 choice param in the UI footer, then 2 for the A and B encorders.",
             "defaultParameters": [
-                "OSC Mix",
+                "OSC2 Mix",
                 "OSC Tune",
                 "VCF Att",
                 "ENV Att",
-                "",
+                "Mode",
                 "",
                 "",
                 "",
@@ -30,7 +30,7 @@
                 {
                     "group": "OSC",
                     "parameters": [
-                        "OSC Mix",
+                        "OSC2 Mix",
                         "OSC Tune",
                         "OSC Fine",
                         "Noise"
@@ -76,6 +76,12 @@
                     "parameters": [
                         "Octave",
                         "Tuning"
+                    ]
+                },
+                {
+                    "group": "Other",
+                    "parameters": [
+                        "Mode"
                     ]
                 }
             ]

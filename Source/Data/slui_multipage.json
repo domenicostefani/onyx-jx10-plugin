@@ -92,7 +92,7 @@
             "parameters": [
                 {
                     "name": "OSC-2 Mix",
-                    "id": "OSC Mix",
+                    "id": "OSC2 Mix",
                     "type": "knob",
                     "description": "Level of second oscillator (both oscillators are sawtooth wave only - but see Vibrato below)"
                 },

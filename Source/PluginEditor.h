@@ -11,18 +11,10 @@
 typedef juce::AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
 
 
-// custom look and feel for invisible textbuttons (borderless, no background, no text)
-class InvisibleTextButtonLookAndFeel : public juce::LookAndFeel_V4
-{
-public:
-    void drawButtonBackground(juce::Graphics&, juce::Button&, const juce::Colour&, bool, bool) override { } // Do nothing to make the button invisible
-    void drawButtonText(juce::Graphics&, juce::TextButton&, bool, bool) override { } // Do nothing to make the button text invisible
-};
-
 //==============================================================================
 /**
 */
-class JX10Editor  : public juce::AudioProcessorEditor
+class JX10Editor  : public juce::AudioProcessorEditor, private juce::Timer
 {
 public:
     JX10Editor (JX10AudioProcessor&);
@@ -44,7 +36,7 @@ private:
     const int ORIGIN_HEIGHT = 1550/2;	
     const float ASPECT_RATIO = (float)ORIGIN_WIDTH/ORIGIN_HEIGHT;
 
-    JX10LookAndFeel JX10LookAndFeel;
+    JX10LookAndFeel _JX10LookAndFeel;
 
     // Linear sliders
     juce::Slider osc2mix_sld{ "osc2mix_sld"},
@@ -97,6 +89,12 @@ private:
                                       osc2tuneAttachment,
                                       osc2fineAttachment,
                                       tuningAttachment;
+
+    juce::Label currentProgram, sllinkStatus;
+    juce::TextButton programButton;
+    InvisibleTextButtonLookAndFeel invisibleButtonLaF;
+
+    void timerCallback() override;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JX10Editor)
 };

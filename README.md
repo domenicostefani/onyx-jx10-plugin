@@ -23,7 +23,7 @@ Please note that the mda JX10 is not related to the JX series of synths availabl
 
 | Parameter | Description |
 | --------- | ----------- |
-| OSC Mix | Level of second oscillator (both oscillators are sawtooth wave only - but see Vibrato below) |
+| OSC2 Mix | Level of second oscillator (both oscillators are sawtooth wave only - but see Vibrato below) |
 | OSC Tune | Tuning of second oscillator in semitones |
 | OSC Fine | Tuning of second oscillator in cents |
 | Glide Mode | POLY = 8-voice polyphonic, P-LEGATO = 8-voice polyphonic with pitch glide if a key is held, P-GLIDE = 8-voice polyphonic with pitch glide, MONO = monophonic, M-LEGATO = monophonic with pitch glide if a key is held, M-GLIDE = monophonic with pitch glide |

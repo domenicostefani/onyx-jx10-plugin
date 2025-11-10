@@ -28,7 +28,7 @@ project(JX10 VERSION 0.0.1)
 set(JUCE_PATH "C:/JUCE" CACHE PATH "Path to JUCE framework")                    # Change this to point to your local JUCE folder
 add_subdirectory(${JUCE_PATH} JUCE)         # If you've put JUCE in a subdirectory called JUCE
 
-set(VST3_COPY_DIR "/Users/domenico/Documents/VST_DEBUG")
+set(VST3_COPY_DIR "~/Documents/VST_DEBUG")
 message(STATUS "VST3_COPY_DIR: ${VST3_COPY_DIR}")
 
 
@@ -50,7 +50,7 @@ juce_add_plugin(JX10          # The name of the target to create
     # VERSION 1.0                               # Set this if the plugin version is different to the project version
     ICON_BIG "Source/Data/icon-big.png"            # ICON_* arguments specify a path to an image file to use as an icon for the Standalone
     ICON_SMALL "Source/Data/icon-small.png"
-    COMPANY_NAME OnyxDSP                          # Specify the name of the plugin's author
+    COMPANY_NAME "OnyxDSP"                          # Specify the name of the plugin's author
     IS_SYNTH TRUE                       # Is this a synth or an effect?
     NEEDS_MIDI_INPUT TRUE               # Does the plugin need midi input?
     # NEEDS_MIDI_OUTPUT TRUE/FALSE              # Does the plugin need midi output?

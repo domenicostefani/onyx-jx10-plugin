@@ -3,7 +3,7 @@
 
 JX10Program::JX10Program()
 {
-    param[0]  = 0.00f;  // OSC Mix
+    param[0]  = 0.00f;  // OSC2 Mix
     param[1]  = 0.25f;  // OSC Tune
     param[2]  = 0.50f;  // OSC Fine
     param[3]  = 0.00f;  // Mode
@@ -82,7 +82,7 @@ void JX10AudioProcessor::setCurrentProgram(int index)
     _currentProgram = index;
 
     const char *paramNames[] = {
-        "OSC Mix",
+        "OSC2 Mix",
         "OSC Tune",
         "OSC Fine",
         "Mode",
@@ -253,7 +253,7 @@ void JX10AudioProcessor::resetState()
 void JX10AudioProcessor::update()
 {
     // Oscillator mix. Keep this as a value between 0 and 1.
-    _oscMix = apvts.getRawParameterValue("OSC Mix")->load();
+    _oscMix = apvts.getRawParameterValue("OSC2 Mix")->load();
 
     // Detune up or down by max 24 semitones, in steps of 1 semitone.
     float param1 = apvts.getRawParameterValue("OSC Tune")->load();
@@ -278,9 +278,21 @@ void JX10AudioProcessor::update()
      */
     _detune = std::pow(1.059463094359f, -semi - 0.01f * cent);
 
-    // Mono / poly / glide mode. This is an integer value from 0 to 7.
-    float param3 = apvts.getRawParameterValue("Mode")->load();
-    _mode = int(7.9f * param3);
+    /* OLD FloatParameter version of the mono/poly/glide mode */
+        // Mono / poly / glide mode. This is an integer value from 0 to 7.
+        // float param3 = apvts.getRawParameterValue("Mode")->load();
+        // _mode = int(7.9f * param3);
+
+    int param3Choice = int(apvts.getRawParameterValue("Mode")->load());
+    switch (param3Choice) {
+        case 0: _mode = 0; break; // new Poly     choice: 0, Old: 0-1
+        case 1: _mode = 2; break; // new P-Legato choice: 1, Old: 2
+        case 2: _mode = 3; break; // new P-Glide  choice: 2, Old: 3
+        case 3: _mode = 4; break; // new Mono     choice: 3, Old: 4-5
+        case 4: _mode = 5; break; // new M-Legato choice: 4, Old: 6
+        case 5: _mode = 6; break; // new M-Glide  choice: 5, Old: 7
+        default: _mode = 0; break;
+    }
 
     // Use a lower update rate for the glide and filter envelope, 32 times
     // (= LFO_MAX) slower than the sample rate.
@@ -1308,19 +1320,30 @@ juce::AudioProcessorValueTreeState::ParameterLayout JX10AudioProcessor::createPa
     // This is why we're keeping the parameters as they were originally.
 
     layout.add(std::make_unique<juce::AudioParameterFloat>(
-        juce::ParameterID("OSC Mix", 1),
-        "OSC Mix",
+        juce::ParameterID("OSC2 Mix", 1),
+        "OSC2 Mix",
         juce::NormalisableRange<float>(),
         0.0f,
         juce::AudioParameterFloatAttributes()
             .withLabel("%")
             .withStringFromValueFunction(
                 [](float value, int) {
-                    char s[16] = { 0 };
-                    sprintf(s, "%4.0f:%2.0f", 100.0 - 50.0f * value, 50.0f * value);
+                    char s[5] = { 0 };
+                    sprintf(s, "%0.2f", value);
                     return juce::String(s);
                 }
             )));
+
+            
+        // juce::AudioParameterFloatAttributes()
+        //     .withLabel("%")
+        //     .withStringFromValueFunction(
+        //         [](float value, int) {
+        //             char s[16] = { 0 };
+        //             sprintf(s, "%4.0f:%2.0f", 100.0 - 50.0f * value, 50.0f * value);
+        //             return juce::String(s);
+        //         }
+        //     )));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID("OSC Tune", 1),
@@ -1351,30 +1374,38 @@ juce::AudioProcessorValueTreeState::ParameterLayout JX10AudioProcessor::createPa
                 }
             )));
 
+    // ---- OLD Float parameter version of MODE
     // If you're wondering why POLY and MONO appear twice, I think this was done
     // so `mode & 4` means any of the mono modes, and `mode & 2` means any of the
     // glide modes (legato or glide). This would have been nicer with an enum and
     // an AudioParameterChoice.
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
+    // layout.add(std::make_unique<juce::AudioParameterFloat>(
+    //     juce::ParameterID("Mode", 1),
+    //     "Mode",
+    //     juce::NormalisableRange<float>(),
+    //     0.0f,
+    //     juce::AudioParameterFloatAttributes().withStringFromValueFunction(
+    //         [](float value, int) {
+    //             int mode = int(7.9f * value);
+    //             switch (mode) {
+    //                 case  0:
+    //                 case  1: return "POLY";
+    //                 case  2: return "P-LEGATO";
+    //                 case  3: return "P-GLIDE";
+    //                 case  4:
+    //                 case  5: return "MONO";
+    //                 case  6: return "M-LEGATO";
+    //                 default: return "M-GLIDE";
+    //             }
+    //         }
+    //     )));
+
+    // --- New Choice parameter version of MODE
+    layout.add(std::make_unique<juce::AudioParameterChoice>(
         juce::ParameterID("Mode", 1),
         "Mode",
-        juce::NormalisableRange<float>(),
-        0.0f,
-        juce::AudioParameterFloatAttributes().withStringFromValueFunction(
-            [](float value, int) {
-                int mode = int(7.9f * value);
-                switch (mode) {
-                    case  0:
-                    case  1: return "POLY";
-                    case  2: return "P-LEGATO";
-                    case  3: return "P-GLIDE";
-                    case  4:
-                    case  5: return "MONO";
-                    case  6: return "M-LEGATO";
-                    default: return "M-GLIDE";
-                }
-            }
-        )));
+        juce::StringArray { "POLY", "P-LEGATO", "P-GLIDE", "MONO", "M-LEGATO", "M-GLIDE" },
+        0));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID("Gld Rate", 1),

@@ -226,7 +226,7 @@ public:
     juce::Font getPopupMenuFont() override
     {
         // Return your desired font
-        return mainFont.withHeight(28.0f); // Adjust the height as needed
+        return mainFont.withHeight(20.0f); // Adjust the height as needed
         // Or use a custom font:
         // return juce::Font(juce::Typeface::createSystemTypefaceFor(BinaryData::your_font_data, BinaryData::your_font_size));
     }
@@ -248,7 +248,7 @@ public:
     // #endif
 
         // Draw thick border around the menu with textcolourid
-        g.setColour(findColour(PopupMenu::textColourId));
+        g.setColour(findColour(PopupMenu::textColourId).withAlpha(0.7f));
         g.drawRect(0, 0, width, height, 2); //
 
     }
@@ -263,3 +263,10 @@ public:
 };
 
 
+// custom look and feel for invisible textbuttons (borderless, no background, no text)
+class InvisibleTextButtonLookAndFeel : public juce::LookAndFeel_V4
+{
+public:
+    void drawButtonBackground(juce::Graphics&, juce::Button&, const juce::Colour&, bool, bool) override { } // Do nothing to make the button invisible
+    void drawButtonText(juce::Graphics&, juce::TextButton&, bool, bool) override { } // Do nothing to make the button text invisible
+};
