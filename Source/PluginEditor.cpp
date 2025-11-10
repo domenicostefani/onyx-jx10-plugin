@@ -412,6 +412,14 @@ void JX10Editor::timerCallback()
     auto programIndex = audioProcessor.getCurrentProgram();
     auto programName = audioProcessor.getProgramName(programIndex);
     currentProgram.setText(programName, juce::dontSendNotification);
+
+    bool isConnected = audioProcessor.uiManager.slLinkManager.isMIDIConnected;
+    if (isConnected) {
+        sllinkStatus.setText("Connected", juce::dontSendNotification);
+    }
+    else {
+        sllinkStatus.setText("Disconnected", juce::dontSendNotification);
+    }
 }
 
 void JX10Editor::showFileMenu(juce::TextButton* button)

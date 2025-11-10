@@ -56,6 +56,8 @@ JX10AudioProcessor::JX10AudioProcessor()
 
     createPrograms();
     setCurrentProgram(0);
+
+    uiManager.setIcon(onyxIcon);
 }
 
 JX10AudioProcessor::~JX10AudioProcessor()
