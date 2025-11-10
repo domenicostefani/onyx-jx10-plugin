@@ -449,10 +449,14 @@ void JX10AudioProcessor::update()
       Why the extra -23.376? Note that if the tuning is 0 octaves and 0 cents,
       `_tune` is actually -48.376. This offset is used to turn MIDI note numbers
       into the correct pitch. More about this in noteOn().
-     */
+
+      NOTE: Octave (param22) was later changed to a ChoiceParameter with values
+      -2, -1, 0, 1, 2 corresponding to read indexes of 0, 1, 2, 3, 4.
+      Therefore std::floor(x*4.9f) is not needed anymore.
+     */    
     float param22 = apvts.getRawParameterValue("Octave")->load();
     float param23 = apvts.getRawParameterValue("Tuning")->load();
-    _tune = -23.376f - 2.0f * param23 - 12.0f * std::floor(param22 * 4.9f);
+    _tune = -23.376f - 2.0f * param23 - 12.0f * param22;
     _tune = _sampleRate * std::pow(1.059463094359f, _tune);
 }
 
@@ -1652,16 +1656,12 @@ juce::AudioProcessorValueTreeState::ParameterLayout JX10AudioProcessor::createPa
                 }
             )));
 
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
+    // Choice version of OCTAVE
+    layout.add(std::make_unique<juce::AudioParameterChoice>(
         juce::ParameterID("Octave", 1),
         "Octave",
-        juce::NormalisableRange<float>(),
-        0.5f,
-        juce::AudioParameterFloatAttributes().withStringFromValueFunction(
-            [](float value, int) {
-                return juce::String(int(value * 4.9f) - 2);
-            }
-            )));
+        juce::StringArray { "Oct -2", "Oct -1", "Oct 0", "Oct +1", "Oct +2" },
+        2));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID("Tuning", 1),
