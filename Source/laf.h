@@ -10,12 +10,11 @@
 class JX10LookAndFeel : public juce::LookAndFeel_V4
 {
     std::unique_ptr<juce::Drawable> sldback_svd_drawable, sldcur_svd_drawable;
-public:
-    // juce::FontOptions mainFontOptions{  juce::FontOptions(juce::Typeface::createSystemTypefaceFor(BinaryData::sysfont_otf, BinaryData::sysfont_otfSize)).withHeight(20.0f) };
-    // juce::Font mainFont{ mainFontOptions };
-    
+public:    
     // Use Arial as main font
-    juce::Font mainFont{ "Arial", 20.0f, juce::Font::bold };
+    // juce::Font mainFont{ "Arial", 20.0f, juce::Font::bold };
+    // [build] /Users/domenico/Develop/ONYX/onyx-jx10/Source/laf.h:18:24: warning: 'Font' is deprecated: Use the constructor that takes a FontOptions argument [-Wdeprecated-declarations]
+    juce::Font mainFont{ juce::FontOptions("Arial", 20.0f, juce::Font::bold) };
 
 public:
     JX10LookAndFeel()
@@ -233,7 +232,7 @@ public:
     }
     
 
-    void drawPopupMenuBackground (Graphics& g, int width, int height)
+    void drawPopupMenuBackground (Graphics& g, int width, int height) override
     {
         auto background = findColour (PopupMenu::backgroundColourId);
 
@@ -257,7 +256,7 @@ public:
     void drawPopupMenuBackgroundWithOptions (Graphics& g,
                                                 int width,
                                                 int height,
-                                                const PopupMenu::Options&)
+                                                const PopupMenu::Options&) override
     {
         drawPopupMenuBackground (g, width, height);
     }

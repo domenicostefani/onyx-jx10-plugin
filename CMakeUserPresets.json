@@ -16,6 +16,22 @@
       "cacheVariables": {
         "JUCE_PATH": "C:/Users/cimil/Develop/ONYX/onyx-saturo-plugin/JUCE"
       }
+    },
+    {
+      "name": "xcode-release-user",
+      "displayName": "USER Xcode Release",
+      "inherits": "xcode-release",
+      "cacheVariables": {
+        "JUCE_PATH": "/Users/domenico/Develop/JUCE"
+      }
+    },
+    {
+      "name": "xcode-debug-user",
+      "displayName": "USER Xcode Debug",
+      "inherits": "xcode-debug",
+      "cacheVariables": {
+        "JUCE_PATH": "/Users/domenico/Develop/JUCE"
+      }
     }
   ],
   "buildPresets": [
@@ -28,6 +44,16 @@
       "name": "msvc-debug-user",
       "inherits": "msvc-debug",
       "configurePreset": "msvc-debug-user"
+    },
+    {
+      "name": "xcode-release-user",
+      "inherits": "xcode-release",
+      "configurePreset": "xcode-release-user"
+    },
+    {
+      "name": "xcode-debug-user",
+      "inherits": "xcode-debug",
+      "configurePreset": "xcode-debug-user"
     }
   ]
 }

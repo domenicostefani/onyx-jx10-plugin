@@ -27,6 +27,26 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "VST3_COPY_DIR": "$ENV{USERPROFILE}/Documents/VST_DEBUG"
       }
+    },
+    {
+      "name": "xcode-release",
+      "displayName": "Xcode Release",
+      "generator": "Xcode",
+      "binaryDir": "${sourceDir}/build/MacOS",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "VST3_COPY_DIR": "$ENV{HOME}/Library/Audio/VST_DEBUG"
+      }
+    },
+    {
+      "name": "xcode-debug",
+      "displayName": "Xcode Debug",
+      "generator": "Xcode",
+      "binaryDir": "${sourceDir}/build/MacOS",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "VST3_COPY_DIR": "$ENV{HOME}/Library/Audio/VST_DEBUG"
+      }
     }
   ],
   "buildPresets": [
@@ -38,6 +58,16 @@
     {
       "name": "msvc-debug",
       "configurePreset": "msvc-debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "xcode-release",
+      "configurePreset": "xcode-release",
+      "configuration": "Release"
+    },
+    {
+      "name": "xcode-debug",
+      "configurePreset": "xcode-debug",
       "configuration": "Debug"
     }
   ]

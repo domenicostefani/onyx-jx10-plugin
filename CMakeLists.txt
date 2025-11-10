@@ -9,12 +9,14 @@
 # information can be found in the CMake docs.
 
 cmake_minimum_required(VERSION 3.22)
+# CMAKE_OSX_DEPLOYMENT_TARGET 13.0
+set(CMAKE_OSX_DEPLOYMENT_TARGET "13.0" CACHE STRING "Minimum OS X deployment version")
 
 # The top-level CMakeLists.txt file for a project must contain a literal, direct call to the
 # `project()` command. `project()` sets up some helpful variables that describe source/binary
 # directories, and the current project version. This is a standard CMake command.
 
-project(ONYXDSP_MDA_JX10 VERSION 0.0.1)
+project(JX10 VERSION 0.0.1)
 
 # If you've installed JUCE somehow (via a package manager, or directly using the CMake install
 # target), you'll need to tell this project that it depends on the installed copy of JUCE. If you've
@@ -26,8 +28,9 @@ project(ONYXDSP_MDA_JX10 VERSION 0.0.1)
 set(JUCE_PATH "C:/JUCE" CACHE PATH "Path to JUCE framework")                    # Change this to point to your local JUCE folder
 add_subdirectory(${JUCE_PATH} JUCE)         # If you've put JUCE in a subdirectory called JUCE
 
-set(VST3_COPY_DIR "$ENV{USERPROFILE}/Documents/VST_DEBUG")
+set(VST3_COPY_DIR "/Users/domenico/Documents/VST_DEBUG")
 message(STATUS "VST3_COPY_DIR: ${VST3_COPY_DIR}")
+
 
 # If you are building a VST2 or AAX plugin, CMake needs to be told where to find these SDKs on your
 # system. This setup should be done before calling `juce_add_plugin`.
@@ -43,11 +46,11 @@ juce_add_module("${CMAKE_CURRENT_SOURCE_DIR}/modules/fatar_sl_link")
 # the formats specified by the FORMATS arguments. This function accepts many optional arguments.
 # Check the readme at `docs/CMake API.md` in the JUCE repo for the full list.
 
-juce_add_plugin(ONYXDSP_MDA_JX10          # The name of the target to create
-    # VERSION ...                               # Set this if the plugin version is different to the project version
-    # ICON_BIG ...                              # ICON_* arguments specify a path to an image file to use as an icon for the Standalone
-    # ICON_SMALL ...
-    # COMPANY_NAME ...                          # Specify the name of the plugin's author
+juce_add_plugin(JX10          # The name of the target to create
+    # VERSION 1.0                               # Set this if the plugin version is different to the project version
+    ICON_BIG "Source/Data/icon-big.png"            # ICON_* arguments specify a path to an image file to use as an icon for the Standalone
+    ICON_SMALL "Source/Data/icon-small.png"
+    COMPANY_NAME OnyxDSP                          # Specify the name of the plugin's author
     IS_SYNTH TRUE                       # Is this a synth or an effect?
     NEEDS_MIDI_INPUT TRUE               # Does the plugin need midi input?
     # NEEDS_MIDI_OUTPUT TRUE/FALSE              # Does the plugin need midi output?
@@ -67,19 +70,21 @@ juce_add_plugin(ONYXDSP_MDA_JX10          # The name of the target to create
 # include all your JUCE module headers; if you're happy to include module headers directly, you
 # probably don't need to call this.
 
-juce_generate_juce_header(ONYXDSP_MDA_JX10)
+juce_generate_juce_header(JX10)
 
 
 if(MSVC)
-    target_compile_options(ONYXDSP_MDA_JX10 PRIVATE /wd4068) # Suppress warning about unknown pragma on windows
+    target_compile_options(JX10 PRIVATE /wd4068) # Suppress warning about unknown pragma on windows
 endif()
+
+
 
 # `target_sources` adds source files to a target. We pass the target that needs the sources as the
 # first argument, then a visibility parameter for the sources which should normally be PRIVATE.
 # Finally, we supply a list of source files that will be built into the target. This is a standard
 # CMake command.
 
-target_sources(ONYXDSP_MDA_JX10
+target_sources(JX10
     PRIVATE
         Source/PluginEditor.cpp
         Source/PluginProcessor.cpp)
@@ -91,7 +96,7 @@ target_sources(ONYXDSP_MDA_JX10
 # definitions will be visible both to your code, and also the JUCE module code, so for new
 # definitions, pick unique names that are unlikely to collide! This is a standard CMake command.
 
-target_compile_definitions(ONYXDSP_MDA_JX10
+target_compile_definitions(JX10
     PUBLIC
         # JUCE_WEB_BROWSER and JUCE_USE_CURL would be on by default, but you might not need them.
         JUCE_WEB_BROWSER=0  # If you remove this, add `NEEDS_WEB_BROWSER TRUE` to the `juce_add_plugin` call
@@ -111,13 +116,26 @@ juce_add_binary_data(AudioPluginData SOURCES
     Source/Data/slider_back.svg
     Source/Data/slider_cursor.svg)
 
+if (APPLE)
+    # target_link_options(JX10 PUBLIC -Wl)
+    message(STATUS "Adding flag to suppress shadow field warning")
+    target_compile_options(JX10 PRIVATE -Wno-shadow-field-in-constructor)
+endif()
+
+# add_library(juce_custom_warning_suppressions INTERFACE)
+# target_compile_options(juce_custom_warning_suppressions 
+# INTERFACE
+# -Wno-shadow-field-in-constructor
+# # Add other custom flags here as needed
+# )
+
 # `target_link_libraries` links libraries and JUCE modules to other libraries or executables. Here,
 # we're linking our executable target to the `juce::juce_audio_utils` module. Inter-module
 # dependencies are resolved automatically, so `juce_core`, `juce_events` and so on will also be
 # linked automatically. If we'd generated a binary data target above, we would need to link to it
 # here too. This is a standard CMake command.
 
-target_link_libraries(ONYXDSP_MDA_JX10
+target_link_libraries(JX10
     PRIVATE
         AudioPluginData
         juce::juce_audio_utils
@@ -125,7 +143,9 @@ target_link_libraries(ONYXDSP_MDA_JX10
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
-        juce::juce_recommended_warning_flags)
+        juce::juce_recommended_warning_flags
+        # juce_custom_warning_suppressions
+        )
 
 
 # add_custom_command(TARGET TestPlugin POST_BUILD
