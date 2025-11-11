@@ -1,4 +1,4 @@
-MDA JX10 Plugin adapted for the SL MK2 Keyboard with UI (SL Link)
+OnyxDSP JX10 Plugin
 ---
 
 This is an adaptation of the MDA JX10 synthesizer (Paul Kellet) through its JUCE port (mda-juce, M.I. Hollemans), with a custom GUI and integration for the FATAR SL MK2 keyboard (SL Link).
