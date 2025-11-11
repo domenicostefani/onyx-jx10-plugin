@@ -615,7 +615,10 @@ void JX10AudioProcessor::processBlock(juce::AudioBuffer<float> &buffer, juce::Mi
 
     update();
 
+    midiCollector.removeNextBlockOfMessages(midiMessages, buffer.getNumSamples()); // Get MIDI messages from the collector for when SLLink is used and the SL3 port is stolen from the daw by this plugin.
     processEvents(midiMessages);
+
+
 
     int sampleFrames = buffer.getNumSamples();
 
