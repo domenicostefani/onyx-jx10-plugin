@@ -9,15 +9,19 @@ Different parameters can be mapped to the keyboard encoders and buttons by simpl
 
 ## Plugin GUI
 
-<img src="docs/gui.png" width="50%" />
+<img src="docs/gui.PNG" width="70%" />
 
 ## SL MK2 Keyboard Integration
 
-<img src="docs/kb2.jpg" width="40%" />  
-<img src="docs/kb1.jpg" width="22.5%" />
+<div>
+<img src="docs/kb2.jpg" width="50%" />
+<img src="docs/kb1.jpg" width="27.5%" />
+</div>
 
-<img src="docs/kb3.jpg" width="26%" />
-<img src="docs/kb4.jpg" width="39%" />
+<div>
+<img src="docs/kb3.jpg" width="32%" />
+<img src="docs/kb4.jpg" width="47%" />
+</div>
 
 
 
