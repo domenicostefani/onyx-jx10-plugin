@@ -2,18 +2,34 @@
 
 <JUCERPROJECT id="lUYjpz" name="JX10" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
-              pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn">
+              pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn"
+              companyName="OnyxDSP" companyCopyright="Domenico Stefani" companyWebsite="https://domenicostefani.com/onyxdsp/"
+              companyEmail="dom@domenicostefani.com" pluginDesc="Polyphonic Synthesizer"
+              pluginManufacturerCode="OnyD" pluginCode="Jx10">
   <MAINGROUP id="w6zN8D" name="JX10">
     <GROUP id="{6710DCDA-6646-EE06-8F56-CF4D30A75DF8}" name="Source">
+      <GROUP id="{EC304018-9D2E-4837-5B27-39974365CE11}" name="Data">
+        <FILE id="zQtQK0" name="backing.svg" compile="0" resource="1" file="Source/Data/backing.svg"/>
+        <FILE id="yQtGd9" name="icon-big.png" compile="0" resource="1" file="Source/Data/icon-big.png"/>
+        <FILE id="tH9K2s" name="icon-small.png" compile="0" resource="1" file="Source/Data/icon-small.png"/>
+        <FILE id="SjuVps" name="slider_back.svg" compile="0" resource="1" file="Source/Data/slider_back.svg"/>
+        <FILE id="EJnUne" name="slider_cursor.svg" compile="0" resource="1"
+              file="Source/Data/slider_cursor.svg"/>
+        <FILE id="KLC8Gq" name="slui.json" compile="0" resource="1" file="Source/Data/slui.json"/>
+      </GROUP>
       <FILE id="FyCcCe" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="OMkNkK" name="PluginProcessor.h" compile="0" resource="0"
             file="Source/PluginProcessor.h"/>
+      <FILE id="idJBZa" name="laf.h" compile="0" resource="0" file="Source/laf.h"/>
+      <FILE id="c8wISL" name="PluginEditor.cpp" compile="1" resource="0"
+            file="Source/PluginEditor.cpp"/>
+      <FILE id="gPolbT" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
   <EXPORTFORMATS>
-    <XCODE_MAC targetFolder="Builds/MacOSX">
+    <XCODE_MAC targetFolder="build/MacOSX" smallIcon="tH9K2s" bigIcon="yQtGd9">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug"/>
         <CONFIGURATION isDebug="0" name="Release"/>
@@ -31,10 +47,33 @@
         <MODULEPATH id="juce_graphics" path="../../../../../JUCE/modules"/>
         <MODULEPATH id="juce_gui_basics" path="../../../../../JUCE/modules"/>
         <MODULEPATH id="juce_gui_extra" path="../../../../../JUCE/modules"/>
+        <MODULEPATH id="fatar_sl_link" path="modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
+    <VS2022 targetFolder="build/VisProj" smallIcon="tH9K2s" bigIcon="yQtGd9">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug"/>
+        <CONFIGURATION isDebug="0" name="Release"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path="../../juce"/>
+        <MODULEPATH id="juce_audio_devices" path="../../juce"/>
+        <MODULEPATH id="juce_audio_formats" path="../../juce"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../juce"/>
+        <MODULEPATH id="juce_audio_processors" path="../../juce"/>
+        <MODULEPATH id="juce_audio_utils" path="../../juce"/>
+        <MODULEPATH id="juce_core" path="../../juce"/>
+        <MODULEPATH id="juce_data_structures" path="../../juce"/>
+        <MODULEPATH id="juce_events" path="../../juce"/>
+        <MODULEPATH id="juce_graphics" path="../../juce"/>
+        <MODULEPATH id="juce_gui_basics" path="../../juce"/>
+        <MODULEPATH id="juce_gui_extra" path="../../juce"/>
+        <MODULEPATH id="fatar_sl_link" path="modules"/>
+      </MODULEPATHS>
+    </VS2022>
   </EXPORTFORMATS>
   <MODULES>
+    <MODULE id="fatar_sl_link" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
