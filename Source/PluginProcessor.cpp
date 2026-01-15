@@ -134,6 +134,8 @@ void JX10AudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
     _sampleRate = sampleRate;
     _inverseSampleRate = 1.0f / _sampleRate;
 
+    midiCollector.reset(_sampleRate);
+
     resetState();
 }
 

@@ -25,7 +25,7 @@ project(JX10 VERSION 0.0.1)
 
 # find_package(JUCE CONFIG REQUIRED)        # If you've installed JUCE to your system
 # or
-set(JUCE_PATH "C:/JUCE" CACHE PATH "Path to JUCE framework")                    # Change this to point to your local JUCE folder
+set(JUCE_PATH "~/JUCE" CACHE PATH "Path to JUCE framework")                    # Change this to point to your local JUCE folder
 add_subdirectory(${JUCE_PATH} JUCE)         # If you've put JUCE in a subdirectory called JUCE
 
 # Detect platform-specific default plugin/debug folder
