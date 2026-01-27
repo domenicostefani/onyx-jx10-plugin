@@ -6,7 +6,7 @@
       "displayName": "USER Win MSVC17 Release",
       "inherits": "msvc-release",
       "cacheVariables": {
-        "JUCE_PATH": "C:/Users/cimil/Develop/ONYX/onyx-saturo-plugin/JUCE"
+        "JUCE_PATH": "C:/Users/dodos/Desktop/all/Develop/0ONYX/onyx-degrade-plugin/JUCE"
       }
     },
     {
@@ -14,7 +14,7 @@
       "displayName": "USER Win MSVC17 Debug",
       "inherits": "msvc-debug",
       "cacheVariables": {
-        "JUCE_PATH": "C:/Users/cimil/Develop/ONYX/onyx-saturo-plugin/JUCE"
+        "JUCE_PATH": "C:/Users/dodos/Desktop/all/Develop/0ONYX/onyx-degrade-plugin/JUCE"
       }
     },
     {

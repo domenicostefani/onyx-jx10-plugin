@@ -23,18 +23,25 @@ JX10Editor::JX10Editor (JX10AudioProcessor& p)
     setResizable(true, true);
 
     
-    constrainer.setFixedAspectRatio(ASPECT_RATIO);
+    // constrainer.setFixedAspectRatio(ASPECT_RATIO);
     // Set minimum and maximum sizes if needed
-    constrainer.setMinimumWidth(ORIGIN_WIDTH);
-    constrainer.setMinimumHeight(ORIGIN_HEIGHT);
-    constrainer.setMaximumWidth(ORIGIN_WIDTH * 4);
-    constrainer.setMaximumHeight(ORIGIN_HEIGHT * 4);
+    constrainer.setMinimumWidth(ORIGIN_WIDTH/3.0f);
+    constrainer.setMinimumHeight(ORIGIN_HEIGHT/3.0f);
+    constrainer.setMaximumWidth(ORIGIN_WIDTH * 4.0f);
+    constrainer.setMaximumHeight(ORIGIN_HEIGHT * 4.0f);
     setConstrainer(&constrainer);
     
+#if JUCE_IOS || (defined(SIMULATE_IOS_ENABLED) && SIMULATE_IOS_ENABLED)
+    std::unique_ptr<juce::XmlElement> xml_background_svg = juce::XmlDocument::parse(BinaryData::top_ipad1_svg); // GET THE SVG AS A XML
+    std::unique_ptr<juce::XmlElement> xml_keyboard_svg = juce::XmlDocument::parse(BinaryData::keyboard_svg); // GET THE SVG AS A XML
+    background_svg_drawable = juce::Drawable::createFromSVG(*xml_background_svg);
+    keyboard_svg_drawable = juce::Drawable::createFromSVG(*xml_keyboard_svg);
+#else
     // juce::File back_svg_file = juce::File("C:/Users/cimil/Develop/ONYX/onyx-jx10/Source/Data/backing.svg");
     // background_svg_drawable = juce::Drawable::createFromSVGFile(back_svg_file);
     std::unique_ptr<juce::XmlElement> xml_background_svg = juce::XmlDocument::parse(BinaryData::backing_svg); // GET THE SVG AS A XML
     background_svg_drawable = juce::Drawable::createFromSVG(*xml_background_svg);
+#endif
 
 
     addAndMakeVisible (&osc2mix_sld);
@@ -257,16 +264,27 @@ JX10Editor::JX10Editor (JX10AudioProcessor& p)
     currentProgram.setLookAndFeel(&_JX10LookAndFeel);
     currentProgram.setFont(_JX10LookAndFeel.mainFont.withHeight(21.0f));
 
+#if FATAR_SL_LINK_ENABLED
     addAndMakeVisible(&sllinkStatus);
     sllinkStatus.setText("Disconnected", juce::dontSendNotification);
     sllinkStatus.setJustificationType(juce::Justification::centred);
     sllinkStatus.setLookAndFeel(&_JX10LookAndFeel);
     sllinkStatus.setFont(_JX10LookAndFeel.mainFont.withHeight(21.0f));
+#endif
 
     addAndMakeVisible(programButton);
     programButton.setButtonText("Program---");
     programButton.setLookAndFeel(&invisibleButtonLaF);
     programButton.onClick = [this]() { showFileMenu(&programButton); };
+
+    
+    #if JUCE_IOS || (defined(SIMULATE_IOS_ENABLED) && SIMULATE_IOS_ENABLED)
+        // nextPageButton
+        addAndMakeVisible(nextPageButton);
+        nextPageButton.setButtonText("Next Page");
+        nextPageButton.setLookAndFeel(&invisibleButtonLaF);
+    #endif
+
 
     Timer::startTimerHz(25); // 25 Hz update rate for Program change to update label
 }
@@ -303,9 +321,63 @@ JX10Editor::~JX10Editor()
 //==============================================================================
 void JX10Editor::paint (juce::Graphics& g)
 {
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
-
+    g.fillAll (juce::Colours::black);   // clear the background
     auto lb = getLocalBounds();
+    auto area = getLocalBounds();
+
+    //-----------------------------------------------------------------------------------
+    // Calculate scale factor
+    float scale = area.getWidth() / (float)ORIGIN_WIDTH;   
+    
+    // Center the scaled content
+    float scaledWidth = ORIGIN_WIDTH * scale;
+    float scaledHeight = ORIGIN_HEIGHT * scale;
+    float xOffset = (area.getWidth() - scaledWidth) * 0.5f;
+    float yOffset = (area.getWidth() - scaledWidth) * 0.5f;
+    
+    // Create and apply transform
+    juce::AffineTransform transform = juce::AffineTransform::scale(scale)
+                                        .translated(xOffset, yOffset);
+    //-----------------------------------------------------------------------------------
+
+#if JUCE_IOS || (defined(SIMULATE_IOS_ENABLED) && SIMULATE_IOS_ENABLED)
+    // ipad top svg ratio is 2440:1020
+    auto height = jmin(lb.getWidth() * (1020.0f / 2440.0f), static_cast<float>(lb.getHeight()));
+    auto width = height * (2440.0f / 1020.0f);
+    // center the svg horizontally
+    juce::Rectangle<int> adjustedBounds (
+        lb.getX() + (lb.getWidth() - static_cast<int>(width)) / 2,
+        lb.getY(),
+        static_cast<int>(width),
+        static_cast<int>(height)
+    );
+
+    // Correct the transform
+    scale = width / (float)ORIGIN_WIDTH;
+    xOffset = (area.getWidth() - width) * 0.5f;
+    transform = juce::AffineTransform::scale(scale)
+                    .translated(xOffset, yOffset);
+
+    background_svg_drawable->drawWithin(
+        g, 
+        adjustedBounds.toFloat(), 
+        juce::RectanglePlacement::fillDestination
+        | juce::RectanglePlacement::xLeft | juce::RectanglePlacement::yTop,
+        1.0f
+    );
+
+    // then draw keyboard at bottom,this time fillint width and then stretching height to less or more
+    float kbdHeight = lb.getHeight() - height;;
+    juce::Rectangle<int> keyboardBounds (lb.getX(), lb.getY() + static_cast<int>(width * (1020.0f / 2440.0f)), width, kbdHeight);
+    keyboard_svg_drawable->drawWithin(
+        g, 
+        keyboardBounds.toFloat(), 
+        juce::RectanglePlacement::stretchToFit
+        | juce::RectanglePlacement::xLeft | juce::RectanglePlacement::yTop,
+        1.0f
+    );
+
+#else
     background_svg_drawable->drawWithin(
         g, 
         lb.toFloat(), 
@@ -313,8 +385,103 @@ void JX10Editor::paint (juce::Graphics& g)
         | juce::RectanglePlacement::xLeft | juce::RectanglePlacement::yTop,
         1.0f
     );
+#endif
 
-    auto area = getLocalBounds();
+
+#if JUCE_IOS || (defined(SIMULATE_IOS_ENABLED) && SIMULATE_IOS_ENABLED)
+    // Values from pixel value in the Inkscape file
+    // osc1mix_sld.setBounds(juce::Rectangle<int>(57/2,313/2,184/2,341/2));
+    osc2mix_sld.setBounds(   juce::Rectangle<int>(253/2,  290/2, 184/2, 292/2));
+    noise_sld.setBounds(     juce::Rectangle<int>(448/2,  290/2, 184/2, 292/2));
+    vcfFreq_sld.setBounds(   juce::Rectangle<int>(682/2,  290/2, 184/2, 292/2));
+    vcfRes_sld.setBounds(    juce::Rectangle<int>(1017/2, 290/2, 184/2, 292/2));
+    glideMode_sld.setBounds( juce::Rectangle<int>(1704/2, 290/2, 184/2, 292/2));
+    vcfEnv_sld.setBounds(    juce::Rectangle<int>(697/2,  682/2, 184/2, 292/2));
+    vcfVel_sld.setBounds(    juce::Rectangle<int>(1017/2, 682/2, 184/2, 292/2));
+    glideRate_sld.setBounds( juce::Rectangle<int>(1588/2, 682/2, 112/2, 292/2)); // Narrower slider
+    glideBend_sld.setBounds( juce::Rectangle<int>(1701/2, 682/2, 112/2, 292/2)); // Narrower slider
+    // lfoRate_sld.setBounds(   juce::Rectangle<int>(/2, /2, 184/2, 341/2));
+    // lfoAmt_sld.setBounds(    juce::Rectangle<int>(/2, /2, 184/2, 341/2));
+    // vibratoAmt_sld.setBounds(juce::Rectangle<int>(/2, /2, 184/2, 341/2));
+    // vcfEnvA_sld.setBounds(   juce::Rectangle<int>(/2, /2, 184/2, 341/2));
+    // vcfEnvD_sld.setBounds(   juce::Rectangle<int>(/2, /2, 184/2, 341/2));
+    // vcfEnvS_sld.setBounds(   juce::Rectangle<int>(/2, /2, 184/2, 341/2));
+    // vcfEnvR_sld.setBounds(   juce::Rectangle<int>(/2, /2, 184/2, 341/2));
+    // ampEnvA_sld.setBounds(   juce::Rectangle<int>(/2, /2, 184/2, 341/2));
+    // ampEnvD_sld.setBounds(   juce::Rectangle<int>(/2, /2, 184/2, 341/2));
+    // ampEnvS_sld.setBounds(   juce::Rectangle<int>(/2, /2, 184/2, 341/2));
+    // ampEnvR_sld.setBounds(   juce::Rectangle<int>(/2, /2, 184/2, 341/2));
+
+    octave_knob.setBounds(juce::Rectangle<int> (1354/2,402/2,44/2,44/2));
+    osc2tune_knob.setBounds(juce::Rectangle<int> (147/2,797/2,44/2,44/2));
+    osc2fine_knob.setBounds(juce::Rectangle<int> (465/2,797/2,44/2,44/2));
+    tuning_knob.setBounds(juce::Rectangle<int> (1354/2,796/2,44/2,44/2));
+
+
+    // Keyboard
+    std::vector<juce::Rectangle<int>> whiteKeys, blackKeys;
+    const float CFAC = 1.90098f; // Correction factor to map from original pixel values to current size
+    g.setColour(juce::Colours::green.withAlpha(0.5f));
+    whiteKeys.emplace_back(101*CFAC, 287*CFAC, 32*CFAC, 152*CFAC);
+    whiteKeys.emplace_back(136*CFAC, 287*CFAC, 32*CFAC, 152*CFAC);
+    whiteKeys.emplace_back(171*CFAC, 287*CFAC, 32*CFAC, 152*CFAC);
+    whiteKeys.emplace_back(206*CFAC, 287*CFAC, 32*CFAC, 152*CFAC);
+    whiteKeys.emplace_back(240*CFAC, 287*CFAC, 32*CFAC, 152*CFAC);
+    whiteKeys.emplace_back(275*CFAC, 287*CFAC, 32*CFAC, 152*CFAC);
+    whiteKeys.emplace_back(311*CFAC, 287*CFAC, 32*CFAC, 152*CFAC);
+    whiteKeys.emplace_back(346*CFAC, 287*CFAC, 32*CFAC, 152*CFAC);
+    whiteKeys.emplace_back(380*CFAC, 287*CFAC, 32*CFAC, 152*CFAC);
+    whiteKeys.emplace_back(416*CFAC, 287*CFAC, 32*CFAC, 152*CFAC);
+    whiteKeys.emplace_back(450*CFAC, 287*CFAC, 32*CFAC, 152*CFAC);
+    whiteKeys.emplace_back(485*CFAC, 287*CFAC, 32*CFAC, 152*CFAC);
+    whiteKeys.emplace_back(520*CFAC, 287*CFAC, 32*CFAC, 152*CFAC);
+    whiteKeys.emplace_back(555*CFAC, 287*CFAC, 32*CFAC, 152*CFAC);
+    whiteKeys.emplace_back(590*CFAC, 287*CFAC, 32*CFAC, 152*CFAC);
+
+    float scaleHeight = kbdHeight / (661/2);
+    for (auto& key : whiteKeys)
+    {
+        // transform keyboard accounting for fixed ratio scaling of upper UI, and stretching of kbd
+        float kbdXscale = scale;
+        float kbdYscale = scaleHeight;
+        float xscaled = key.getX() * kbdXscale + xOffset;
+        float yscaled = (key.getY()-1020/2)* kbdYscale + height;  // + yOffset + height;
+        float wscaled = key.getWidth() * kbdXscale;
+        float hscaled = key.getHeight() * kbdYscale;
+
+        auto scaledKey = juce::Rectangle<int>(static_cast<int>(xscaled), static_cast<int>(yscaled), static_cast<int>(wscaled), static_cast<int>(hscaled));
+        g.fillRect(scaledKey);
+    }
+
+    g.setColour(juce::Colours::red.withAlpha(0.5f));
+    blackKeys.emplace_back(121*CFAC, 287*CFAC, 19*CFAC, 97*CFAC);
+    blackKeys.emplace_back(163*CFAC, 287*CFAC, 19*CFAC, 97*CFAC);
+    blackKeys.emplace_back(226*CFAC, 287*CFAC, 19*CFAC, 97*CFAC);
+    blackKeys.emplace_back(265*CFAC, 287*CFAC, 19*CFAC, 97*CFAC);
+    blackKeys.emplace_back(302*CFAC, 287*CFAC, 19*CFAC, 97*CFAC);
+    blackKeys.emplace_back(366*CFAC, 287*CFAC, 19*CFAC, 97*CFAC);
+    blackKeys.emplace_back(408*CFAC, 287*CFAC, 19*CFAC, 97*CFAC);
+    blackKeys.emplace_back(471*CFAC, 287*CFAC, 19*CFAC, 97*CFAC);
+    blackKeys.emplace_back(510*CFAC, 287*CFAC, 19*CFAC, 97*CFAC);
+    blackKeys.emplace_back(547*CFAC, 287*CFAC, 19*CFAC, 97*CFAC);
+    blackKeys.emplace_back(610*CFAC, 287*CFAC, 19*CFAC, 97*CFAC);
+    for (auto& key : blackKeys)
+    {
+        // transform keyboard accounting for fixed ratio scaling of upper UI, and stretching of kbd
+        float kbdXscale = scale;
+        float kbdYscale = scaleHeight;
+        float xscaled = key.getX() * kbdXscale + xOffset;
+        float yscaled = (key.getY()-1020/2)* kbdYscale + height;  // + yOffset + height;
+        float wscaled = key.getWidth() * kbdXscale;
+        float hscaled = key.getHeight() * kbdYscale;
+
+        auto scaledKey = juce::Rectangle<int>(static_cast<int>(xscaled), static_cast<int>(yscaled), static_cast<int>(wscaled), static_cast<int>(hscaled));
+        g.fillRect(scaledKey);
+    }
+
+
+
+#else
     osc2mix_sld.setBounds(juce::Rectangle<int>(151/2 ,210/2, 18, 144)); // Values from pixel value in the Inkscape file
     noise_sld.setBounds(juce::Rectangle<int>  (471/2 ,210/2, 18, 144));
     vcfFreq_sld.setBounds(juce::Rectangle<int>(760/2 ,210/2, 18, 144));
@@ -336,34 +503,29 @@ void JX10Editor::paint (juce::Graphics& g)
     ampEnvS_sld.setBounds(   juce::Rectangle<int>(1709/2,1060/2, 18, 144));
     ampEnvR_sld.setBounds(   juce::Rectangle<int>(1839/2,1060/2, 18, 144));
 
-    
     octave_knob.setBounds(juce::Rectangle<int> (1354/2, 320/2, 24, 24));
     osc2tune_knob.setBounds(juce::Rectangle<int> (143/2, 714/2, 24, 24));
     osc2fine_knob.setBounds(juce::Rectangle<int> (463/2, 714/2, 24, 24));
     tuning_knob.setBounds(juce::Rectangle<int> (1354/2, 714/2, 24, 24));
+#endif
 
+
+
+
+
+#if FATAR_SL_LINK_ENABLED
     sllinkStatus.setBounds(juce::Rectangle<int>(2007/2, 1196/2, 372/2, 60/2));
+#endif
 
-    currentProgram.setBounds(juce::Rectangle<int>(874/2, 1463/2, 1530/2, 60/2));
-    programButton.setBounds(juce::Rectangle<int>(74/2, 1463/2, 2330/2, 60/2));
+    currentProgram.setBounds(juce::Rectangle<int>(645/2, 20/2, 1233/2, 60/2));
+    programButton.setBounds(juce::Rectangle<int>(0/2, 0/2, 1880/2, 100/2));
+
+#if JUCE_IOS || (defined(SIMULATE_IOS_ENABLED) && SIMULATE_IOS_ENABLED)
+    nextPageButton.setBounds(juce::Rectangle<int>(2095/2, 886/2, (327)/2, (120)/2));
+#endif
 
 
-    // Calculate scale factors
-    float scaleX = area.getWidth() / (float)ORIGIN_WIDTH;
-    float scaleY = area.getHeight() / (float)ORIGIN_HEIGHT;
     
-    // Use the smaller scale factor to maintain aspect ratio
-    float scale = juce::jmin(scaleX, scaleY);
-    
-    // Center the scaled content
-    float scaledWidth = ORIGIN_WIDTH * scale;
-    float scaledHeight = ORIGIN_HEIGHT * scale;
-    float xOffset = (area.getWidth() - scaledWidth) * 0.5f;
-    float yOffset = (area.getHeight() - scaledHeight) * 0.5f;
-    
-    // Create and apply transform
-    juce::AffineTransform transform = juce::AffineTransform::scale(scale)
-                                        .translated(xOffset, yOffset);
 
     // Apply the transform to components
     osc2mix_sld.setTransform(transform);
@@ -393,8 +555,10 @@ void JX10Editor::paint (juce::Graphics& g)
     tuning_knob.setTransform(transform);
     //
     currentProgram.setTransform(transform);
-    sllinkStatus.setTransform(transform);
     programButton.setTransform(transform);
+#if FATAR_SL_LINK_ENABLED
+    sllinkStatus.setTransform(transform);
+#endif
 }
 
 void JX10Editor::resized()
@@ -413,6 +577,7 @@ void JX10Editor::timerCallback()
     auto programName = audioProcessor.getProgramName(programIndex);
     currentProgram.setText(programName, juce::dontSendNotification);
 
+#if FATAR_SL_LINK_ENABLED
     bool isConnected = audioProcessor.uiManager.slLinkManager.isMIDIConnected;
     if (isConnected) {
         sllinkStatus.setText("Connected", juce::dontSendNotification);
@@ -420,6 +585,7 @@ void JX10Editor::timerCallback()
     else {
         sllinkStatus.setText("Disconnected", juce::dontSendNotification);
     }
+#endif
 }
 
 void JX10Editor::showFileMenu(juce::TextButton* button)

@@ -2,6 +2,7 @@
 
 #include <JuceHeader.h>
 
+
 const int NPARAMS = 24;       // number of parameters
 const int NVOICES = 8;        // max polyphony
 
@@ -155,10 +156,12 @@ public:
         0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000
     };
 
+#if FATAR_SL_LINK_ENABLED
     // SL LINK
     juce::MidiMessageCollector midiCollector;
     juce::AudioDeviceManager deviceManager;
     UIManager uiManager { *this, deviceManager , "OnyxDSP JX10", BinaryData::slui_json,  BinaryData::slui_jsonSize, apvts, &midiCollector };
+#endif
 
 private:
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();

@@ -30,6 +30,9 @@ private:
     JX10AudioProcessor& audioProcessor;
 
     std::unique_ptr<juce::Drawable> background_svg_drawable;
+#if JUCE_IOS || (defined(SIMULATE_IOS_ENABLED) && SIMULATE_IOS_ENABLED)
+    std::unique_ptr<juce::Drawable> keyboard_svg_drawable;
+#endif
     juce::ComponentBoundsConstrainer constrainer;
 
     const int ORIGIN_WIDTH = 2440/2;
@@ -90,9 +93,16 @@ private:
                                       osc2fineAttachment,
                                       tuningAttachment;
 
-    juce::Label currentProgram, sllinkStatus;
+    juce::Label currentProgram;
+#if FATAR_SL_LINK_ENABLED
+    juce::Label sllinkStatus;
+#endif
     juce::TextButton programButton;
     InvisibleTextButtonLookAndFeel invisibleButtonLaF;
+
+#if JUCE_IOS || (defined(SIMULATE_IOS_ENABLED) && SIMULATE_IOS_ENABLED)
+    juce::TextButton nextPageButton; // Next page button for iOS
+#endif  
 
     void timerCallback() override;
 

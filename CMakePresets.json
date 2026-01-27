@@ -11,7 +11,7 @@
       "displayName": "Win MSVC17 Release",
       "generator": "Visual Studio 17 2022",
       "architecture": "x64",
-      "binaryDir": "${sourceDir}/build/VisualStudio2022/x64",
+      "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "VST3_COPY_DIR": "$ENV{USERPROFILE}/Documents/VST_DEBUG"
@@ -22,7 +22,7 @@
       "displayName": "Win MSVC17 Debug",
       "generator": "Visual Studio 17 2022",
       "architecture": "x64",
-      "binaryDir": "${sourceDir}/build/VisualStudio2022/x64",
+      "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "VST3_COPY_DIR": "$ENV{USERPROFILE}/Documents/VST_DEBUG"

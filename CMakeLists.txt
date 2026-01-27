@@ -12,6 +12,10 @@ cmake_minimum_required(VERSION 3.22)
 # CMAKE_OSX_DEPLOYMENT_TARGET 13.0
 set(CMAKE_OSX_DEPLOYMENT_TARGET "13.0" CACHE STRING "Minimum OS X deployment version")
 
+set(SIMULATE_IOS ON)
+set(FATAR_SL_LINK OFF)
+
+
 # The top-level CMakeLists.txt file for a project must contain a literal, direct call to the
 # `project()` command. `project()` sets up some helpful variables that describe source/binary
 # directories, and the current project version. This is a standard CMake command.
@@ -52,7 +56,12 @@ message(STATUS "VST3_COPY_DIR: ${VST3_COPY_DIR}")
 # juce_set_vst2_sdk_path(...)
 # juce_set_aax_sdk_path(...)
 
-juce_add_module("${CMAKE_CURRENT_SOURCE_DIR}/modules/fatar_sl_link")
+if (FATAR_SL_LINK)
+    message(STATUS "Including fatar_sl_link module")
+    juce_add_module("${CMAKE_CURRENT_SOURCE_DIR}/modules/fatar_sl_link")
+else()
+    message(STATUS "Not including fatar_sl_link module")
+endif()
 
 # `juce_add_plugin` adds a static library target with the name passed as the first argument
 # (AudioPluginExample here). This target is a normal CMake target, but has a lot of extra properties set
@@ -115,7 +124,10 @@ target_compile_definitions(JX10
         # JUCE_WEB_BROWSER and JUCE_USE_CURL would be on by default, but you might not need them.
         JUCE_WEB_BROWSER=0  # If you remove this, add `NEEDS_WEB_BROWSER TRUE` to the `juce_add_plugin` call
         JUCE_USE_CURL=0     # If you remove this, add `NEEDS_CURL TRUE` to the `juce_add_plugin` call
-        JUCE_VST3_CAN_REPLACE_VST2=0)
+        JUCE_VST3_CAN_REPLACE_VST2=0
+        $<$<BOOL:${FATAR_SL_LINK}>:FATAR_SL_LINK_ENABLED>
+        SIMULATE_IOS_ENABLED=$<BOOL:${SIMULATE_IOS}>
+)
 
 # If your target needs extra binary assets, you can add them here. The first argument is the name of
 # a new static library target that will include all the binary resources. There is an optional
@@ -124,17 +136,38 @@ target_compile_definitions(JX10
 # static library. These source files can be of any kind (wav data, images, fonts, icons etc.).
 # Conversion to binary-data will happen when your target is built.
 
-juce_add_binary_data(AudioPluginData SOURCES 
+# Part 1: Create the file list
+set(AUDIO_PLUGIN_DATA_SOURCES
     Source/Data/slui.json
     Source/Data/backing.svg
     Source/Data/slider_back.svg
-    Source/Data/slider_cursor.svg)
+    Source/Data/slider_cursor.svg
+    )
+    
+    # You can now conditionally add more files
+    # if(SOME_VARIABLE)
+    #     list(APPEND AUDIO_PLUGIN_DATA_SOURCES
+    #         Source/Data/additional_file.svg
+    #     )
+    # endif()
+if (IOS OR SIMULATE_IOS)
+    list(APPEND AUDIO_PLUGIN_DATA_SOURCES
+        Source/Data/top_ipad1.svg
+        Source/Data/top_ipad2.svg
+        Source/Data/keyboard.svg
+    )
+endif()
+
+# Part 2: Use the list with juce_add_binary_data
+juce_add_binary_data(AudioPluginData SOURCES ${AUDIO_PLUGIN_DATA_SOURCES})
 
 if (APPLE)
     # target_link_options(JX10 PUBLIC -Wl)
     message(STATUS "Adding flag to suppress shadow field warning")
     target_compile_options(JX10 PRIVATE -Wno-shadow-field-in-constructor)
 endif()
+
+
 
 # add_library(juce_custom_warning_suppressions INTERFACE)
 # target_compile_options(juce_custom_warning_suppressions 
@@ -153,13 +186,13 @@ target_link_libraries(JX10
     PRIVATE
         AudioPluginData
         juce::juce_audio_utils
-        fatar_sl_link
+        $<$<BOOL:${FATAR_SL_LINK}>:fatar_sl_link>
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags
-        # juce_custom_warning_suppressions
-        )
+)
+
 
 
 # add_custom_command(TARGET TestPlugin POST_BUILD

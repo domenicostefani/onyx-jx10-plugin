@@ -57,7 +57,9 @@ JX10AudioProcessor::JX10AudioProcessor()
     createPrograms();
     setCurrentProgram(0);
 
-    uiManager.setIcon(onyxIcon);
+    #if FATAR_SL_LINK_ENABLED
+        uiManager.setIcon(onyxIcon);
+    #endif
 }
 
 JX10AudioProcessor::~JX10AudioProcessor()
@@ -134,7 +136,9 @@ void JX10AudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
     _sampleRate = sampleRate;
     _inverseSampleRate = 1.0f / _sampleRate;
 
+#if FATAR_SL_LINK_ENABLED
     midiCollector.reset(_sampleRate);
+#endif
 
     resetState();
 }
@@ -617,7 +621,9 @@ void JX10AudioProcessor::processBlock(juce::AudioBuffer<float> &buffer, juce::Mi
 
     update();
 
+#if FATAR_SL_LINK_ENABLED
     midiCollector.removeNextBlockOfMessages(midiMessages, buffer.getNumSamples()); // Get MIDI messages from the collector for when SLLink is used and the SL3 port is stolen from the daw by this plugin.
+#endif
     processEvents(midiMessages);
 
 
@@ -1279,6 +1285,7 @@ void JX10AudioProcessor::getStateInformation(juce::MemoryBlock &destData)
     if (apvtsXml)
         root.addChildElement(apvtsXml.release());
 
+#if FATAR_SL_LINK_ENABLED
     DBG("getStateInformation: Saving UIManager state.");
 
     // Get UI state and convert to JSON string
@@ -1291,6 +1298,7 @@ void JX10AudioProcessor::getStateInformation(juce::MemoryBlock &destData)
     root.addChildElement(uiStateXml.release());
 
     DBG("getStateInformation: Finished saving state information.");
+#endif
 
     copyXmlToBinary(root, destData);
 }
@@ -1310,6 +1318,7 @@ void JX10AudioProcessor::setStateInformation(const void *data, int sizeInBytes)
     if (auto *apvtsXml = root->getChildByName(apvts.state.getType()))
         apvts.replaceState(juce::ValueTree::fromXml(*apvtsXml));
 
+#if FATAR_SL_LINK_ENABLED
     // Restore UIManager state if present
     if (auto *uiStateXml = root->getChildByName("UIManagerState"))
     {
@@ -1317,6 +1326,8 @@ void JX10AudioProcessor::setStateInformation(const void *data, int sizeInBytes)
         juce::var uiState = juce::JSON::parse(uiStateStr);
         uiManager.setUIState(uiState);
     }
+    DBG("setStateInformation: Finished restoring state information.");
+#endif
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout JX10AudioProcessor::createParameterLayout()
@@ -1681,6 +1692,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout JX10AudioProcessor::createPa
                 }
             )));
 
+#if FATAR_SL_LINK_ENABLED
     layout.add(std::make_unique<juce::AudioParameterChoice>(
         juce::ParameterID("currentPage", 1),      // parameter ID
         "SLLink",           // parameter name
@@ -1689,6 +1701,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout JX10AudioProcessor::createPa
         0,                  // default index 
         "SLLink"            // parameter group (optional)
         ));
+#endif
 
     return layout;
 }

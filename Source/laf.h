@@ -58,6 +58,13 @@ public:
     {
         float backgroundBottomMargin = (float)getSliderThumbRadius(slider); //roundf(0.124 * height); //0.07f
         float backgroundTopMargin    = backgroundBottomMargin;
+#if JUCE_DEBUG
+        g.setColour(juce::Colours::orange);
+        g.drawRect(x, y, width, height, 2); // Draw full slider area for debug
+        g.setColour (juce::Colours::green);
+        g.drawRect((float)x, (float)(y - backgroundTopMargin),(float) (width), (float)(height + backgroundTopMargin + backgroundBottomMargin), 
+                   (float)2); // Draw background area for debug
+#endif
 
         if (slider.isBar())
         {
@@ -79,14 +86,18 @@ public:
             Point<float> endPoint (slider.isHorizontal() ? (float) (width + x) : startPoint.x,
                                 slider.isHorizontal() ? startPoint.y : (float) y);
 
+
+            // Inner svg's ratio is 18:144 and the height should fill the available area, while width is centered. the rest is transparent 
+            float ii_height = (float) height + backgroundTopMargin + backgroundBottomMargin,
+                  ii_width  = ii_height * (18.0f / 144.0f),
+                  ii_x      = (float) x + ((float) width - ii_width) * 0.5f,
+                  ii_y      = (float) y - backgroundTopMargin;
+            juce::Rectangle<float> svgBackRect = juce::Rectangle<float>(ii_x, ii_y, ii_width, ii_height);
+
             // Draw background svg
             if (sldback_svd_drawable != nullptr)
             {
                 // With cast to all values
-                juce::Rectangle<float> svgBackRect = juce::Rectangle<float>(static_cast<float> (x), 
-                                                     static_cast<float> (y) - backgroundTopMargin, 
-                                                     static_cast<float> (width), 
-                                                     static_cast<float> (height) + backgroundTopMargin + backgroundBottomMargin);
                 sldback_svd_drawable->drawWithin(g, svgBackRect, juce::RectanglePlacement::stretchToFit , 1.0f);
 
                 // g.setColour(juce::Colours::green);
@@ -127,7 +138,7 @@ public:
                 if (sldcur_svd_drawable != nullptr)
                 {
                     // TODO: Now only works for vertical
-                    float thumbWidth = static_cast<float> (width);
+                    float thumbWidth = static_cast<float> (ii_width);
                     float thumbHeight = thumbWidth / 32.0f * 51.0f; // svg aspect ratio is 32x51
 
 
